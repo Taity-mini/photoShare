@@ -1,12 +1,10 @@
 <!doctype html>
-
 <html lang="en">
 <head>
     <meta charset="utf-8">
 
     <title>PhotoShare</title>
-    <meta name="description" content="The HTML5 Herald">
-    <meta name="author" content="SitePoint">
+    <meta name="description" content="PhotoShare">
     <!--Unsemantic framework CSS-->
     <link rel="stylesheet" href="css/unsemantic.min.css">
 
@@ -21,8 +19,36 @@
     <![endif]-->
 </head>
 <body>
+    <header>
+        <h1>PhotoShare</h1>
+        <nav>
+         <ul>
+             <li><a href "#">Photos</a>
+                 <ul>
+                     <li><a href "#">Upload</a></li>
+                     <li><a href "#">Create Album</a></li>
+                     <li><a href "#">Purchase</a></li>
+                 </ul>
+             </li>
+             <li><a href "#">Login</a></li>
+             <li><a href "#">Registration</a></li>
+             <li><a href ="#">Search</a></li>
+             <li><a href "#">Admin</a>
+                 <ul>
+                     <li><a href="#">Approve Member</a></li>
+                     <li><a href="#">Banning</a></li>
+                 </ul>
+             </li>
+         </ul>
+        </nav>
+    </header>
 
+    <div class="grid-container">
+    <p>Testing</p>
+    </div>
 
-
+    <footer>
+    <span>© <?php echo date("Y"); ?> PhotoShare</span>
+    </footer>
 </body>
 </html>
