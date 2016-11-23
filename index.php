@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
 
+    <?php include('inc/config.php'); ?>
+
     <title>PhotoShare</title>
     <meta name="description" content="PhotoShare">
     <!--Unsemantic framework CSS-->
@@ -30,7 +32,7 @@
                      <li><a href "#">Purchase</a></li>
                  </ul>
              </li>
-             <li><a href "#">Login</a></li>
+             <li><a href "./login.php"">Login</a></li>
              <li><a href "#">Registration</a></li>
              <li><a href ="#">Search</a></li>
              <li><a href "#">Admin</a>
