@@ -64,26 +64,68 @@ class user_groups
         $this->groupDescription = $groupDescription;
     }
 
+    //Create groups for user
+
+    public function create($conn)
+    {
+        $sql = "INSERT INTO user_groups VALUES (:userID, :groupID)";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+        $stmt->bindParam(':groupID', $this->getGroupID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return "Create failed: " . $e->getMessage();
+        }
+    }
+
+    //Delete groups from user
+
+    public function delete($conn, $userID)
+    {
+        $sql = "DELETE FROM user_groups WHERE userID = :userID";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $array = array();
+            foreach ($results as $row) {
+                array_push($array, $row["roleID"]);
+            }
+            return $array;
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
+
     public function getAllDetails($conn)
     {
         try {
-            $sql = "SELECT * FROM user_groups WHERE :userID AND groupID = :groupID";
+            $sql = "SELECT * FROM user_groups ug, groups g WHERE ug.userID = :userID and ug.groupID = g.groupID";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':userID', $this->getUserID, PDO::PARAM_STR);
-            $stmt->bindParam(':groupID', $this->getGroupID(), PDO::PARAM_INT);
+            $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
 
             try {
                 $stmt->execute();
                 $results = $stmt->fetchAll();
 
                 foreach ($results as $row) {
-                    $this->setUserID($row["userID"]);
                     $this->setGroupID($row["groupID"]);
+                    $this->setGroupDescription($row['groupDescription']);
+                    $this->setGroupName($row['groupName']);
                 }
                 return true;
             } catch (PDOException $e) {
                 return "Query failed: " . $e->getMessage();
             }
+
         } catch (PDOException $e) {
             return "Query failed: " . $e->getMessage();
         }
@@ -178,9 +220,8 @@ class user_groups
 
 
     //Listing groups
-
-
-    public function listAllAdministrators($conn) {
+    public function listAllAdministrators($conn)
+    {
         $sql = "SELECT u.username, CONCAT(p.firstName, ' ', p.lastName) AS name FROM users u, profile p, user_groups g WHERE g.groupID = 1 AND g.userID = u.userID";
         $stmt = $conn->prepare($sql);
 
@@ -199,7 +240,8 @@ class user_groups
         }
     }
 
-    public function listAllPhotographers($conn) {
+    public function listAllPhotographers($conn)
+    {
         $sql = "SELECT u.username, CONCAT(p.firstName, ' ', p.lastName) AS name FROM users u, profile p, user_groups g WHERE g.groupID = 2 AND g.userID = u.userID";
         $stmt = $conn->prepare($sql);
 
@@ -219,7 +261,8 @@ class user_groups
     }
 
 
-    public function listAllShoppers($conn) {
+    public function listAllShoppers($conn)
+    {
         $sql = "SELECT u.username, CONCAT(p.firstName, ' ', p.lastName) AS name FROM users u, profile p, user_groups g WHERE g.groupID = 3 AND g.userID = u.userID";
         $stmt = $conn->prepare($sql);
 
@@ -238,5 +281,3 @@ class user_groups
         }
     }
 }
-
-?>

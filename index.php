@@ -1,9 +1,26 @@
+<?php
+session_start();
+
+include('inc/config.php');
+require_once('obj/users.obj.php');
+require_once('obj/users.groups.obj.php');
+
+$conn = dbConnect();
+$user ="";
+if (isset($_SESSION['userID'])) {
+
+    $user = new users($_SESSION['username']);
+    $user->setUserID($_SESSION['userID']);
+    $user->getAllDetails($conn);
+
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-
-    <?php include('inc/config.php'); ?>
 
     <title>PhotoShare</title>
     <meta name="description" content="PhotoShare">
@@ -21,36 +38,52 @@
     <![endif]-->
 </head>
 <body>
-    <header>
-        <h1>PhotoShare</h1>
-        <nav>
-         <ul>
-             <li><a href "#">Photos</a>
-                 <ul>
-                     <li><a href "#">Upload</a></li>
-                     <li><a href "#">Create Album</a></li>
-                     <li><a href "#">Purchase</a></li>
-                 </ul>
-             </li>
-             <li><a href "./login.php"">Login</a></li>
-             <li><a href "#">Registration</a></li>
-             <li><a href ="#">Search</a></li>
-             <li><a href "#">Admin</a>
-                 <ul>
-                     <li><a href="#">Approve Member</a></li>
-                     <li><a href="#">Banning</a></li>
-                 </ul>
-             </li>
-         </ul>
-        </nav>
-    </header>
+<header>
+    <h1>PhotoShare</h1>
+    <nav>
+        <ul>
+            <li><a href "#">Photos</a>
+                <ul>
+                    <li><a href="#">Upload</a></li>
+                    <li><a href="#">Create Album</a></li>
+                    <li><a href="#">Purchase</a></li>
+                </ul>
+            </li>
+            <?php
+            if (isset($_SESSION['userID'])) {
+                echo '<li><a href="./logout.php">Logout</a></li>';
+            } else {
+                echo '<li><a href="./login.php">Login</a></li>';
+            }
+            ?>
 
-    <div class="grid-container">
+            <li><a href="#">Registration</a></li>
+            <li><a href="#">Search</a></li>
+            <li><a href="#">Admin</a>
+                <ul>
+                    <li><a href="#">Approve Member</a></li>
+                    <li><a href="#">Banning</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<div class="grid-container">
     <p>Testing</p>
-    </div>
 
-    <footer>
+    <?php
+    if (isset($_SESSION['userID'])) {
+
+        print $user->getUsername();
+
+    }
+    ?>
+
+</div>
+
+<footer>
     <span>© <?php echo date("Y"); ?> PhotoShare</span>
-    </footer>
+</footer>
 </body>
 </html>

@@ -1,25 +1,20 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: Andrew
+ * Date: 26/11/2016
+ * Time: 17:57
+ */
+
 session_start();
 
 include('../inc/config.php');
 require_once('../obj/users.obj.php');
 require_once('../obj/users.groups.obj.php');
-require_once('../obj/photos.obj.php');
 require_once('../obj/albums.obj.php');
+require_once('../obj/photos.obj.php');
 $conn = dbConnect();
 
-if (is_null($_GET["u"])) {
-    header('Location:' . $domain . '404.php');
-    exit;
-} else {
-    $users = new Users($_GET["u"]);
-    $groups = new user_groups();
-
-    if (!$users->doesExist($conn)) {
-        echo "user doesn't exist";
-        exit;
-    }
-}
 
 ?>
 
@@ -45,7 +40,7 @@ if (is_null($_GET["u"])) {
 </head>
 <body>
 <header>
-    <h1>PhotoShare</h1>
+    <h1>PhotoShare | View Album</h1>
     <nav>
         <ul>
             <li><a href "#">Photos</a>
@@ -76,39 +71,45 @@ if (is_null($_GET["u"])) {
 </header>
 
 <div class="grid-container">
-    <h1>User Profile</h1>
+
 
     <?php
     $conn = dbConnect();
-    $users = new Users($_GET["u"]);
-    $users->getAllDetails($conn);
-    $users->getUserNameFromUserID($conn);
-    $groups = new user_groups();
 
-    $groups->setUserID($_GET["u"]);
-    $groups->getAllDetails($conn);
-
-    echo "First Name " . $users->getFirstName();
-    echo "</br>";
-    echo "Last Name " . $users->getLastName();
-    echo "</br>";
-
-    echo "Email:  " . $users->getEmail();
-    echo "</br>";
-
-    echo "Bio:  " . $users->getBio();
-    echo "</br>";
-
-    echo "Username: " . $users->getUsername();
-    echo "</br>";
-    echo "Group: " . $groups->getGroupName();
 
     $albums = new albums();
 
 
+    echo "<h2>Latest 5 Photos</h2>";
+
+    $photos = new Photos();
+    $photos->setAlbumID($albums->getAlbumID());
+    $photo_listing = $photos->getLatestFivePhotos($conn);
+
+
+    $cols = 5;    // Define number of columns
+    $counter = 1;     // Counter used to identify if we need to start or end a row
+
+    echo '<table width="100%" align="center" cellpadding="4" cellspacing="1">';
+    foreach ($photo_listing as $row) {
+        if (($counter % $cols) == 1) {    // Check if it's new row
+            echo '<tr>';
+        }
+        $photolink = "../photos/view_photo.php?p=" . $row['photoID'];
+        echo "<td><b>Title:" . $row['title'] . "</b>";
+        echo '<br><a href="' . $photolink . '"> <img style="width:250px; height:250px;"  src="' . $row['filePath'] . '"/></a>';
+        echo "</td>";
+        if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
+            echo '</tr>';
+        }
+        $counter++;
+    }
+    echo "</table>";
+
+
     echo "<h2>Albums</h2>";
 
-    if ($album_listing = $albums->listAllAlbums($conn, $users->getUserID())) {
+    if ($album_listing = $albums->listAllAlbums($conn)) {
 
         $cols = 5;    // Define number of columns
         $counter = 1;     // Counter used to identify if we need to start or end a row
@@ -135,6 +136,7 @@ if (is_null($_GET["u"])) {
     } else {
         echo "This user doesn't have any albums, at the moment";
     }
+
     ?>
 </div>
 

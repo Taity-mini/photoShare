@@ -8,18 +8,21 @@ class users
 
 
     //Constructor
-    function __construct($username = "cat"){
-        $this->username = $username;
+    function __construct($userID = -1)
+    {
+        $this->userID = $userID;
     }
 
 
     //Getters
 
-    public function getUserID(){
+    public function getUserID()
+    {
         return $this->userID;
     }
 
-    public function getUserIDFromUsername($conn){
+    public function getUserIDFromUsername($conn)
+    {
         $sql = "SELECT userID FROM users WHERE username = :username";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
@@ -37,87 +40,119 @@ class users
         }
     }
 
-    public function getUsername(){
-        return $this->username;
-    }
-
-    public function getEmail(){
-        return $this->email;
-    }
-
-    public function getFirstName(){
-        return $this->firstName;
-    }
-
-    public function getLastName(){
-        return $this->lastName;
-    }
-
-    public function getBio(){
-        return $this->bio;
-    }
-
-    public function getWebsite(){
-        return $this->website;
-    }
-
-
-    //Setters
-
-    public function setUserID($userID){
-        $this->userID = $userID;
-    }
-
-    public function setUsername($username){
-        $this->username = $username;
-    }
-
-    public function setEmail($email){
-        $this->email = $email;
-    }
-
-    public function setFirstName($firstName){
-        $this->firstName = $firstName;
-    }
-
-    public function setLastName($lastName){
-        $this->lastName = $lastName;
-    }
-
-    public function setBio($bio){
-        $this->bio = $bio;
-    }
-
-    public function setWebsite($website){
-        $this->website = $website;
-    }
-
-
-    //get all details
-
-
-    public function getAllDetails($conn) {
-        $sql = "SELECT * FROM profiles WHERE userID = :userID";
+    public function getUserNameFromUserID($conn)
+    {
+        $sql = "SELECT username FROM users WHERE userID = :userID";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':userID', $this->userID, PDO::PARAM_STR);
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
 
         try {
             $stmt->execute();
             $results = $stmt->fetchAll();
 
             foreach ($results as $row) {
-                $this->setUsername($row["username"]);
-                $this->setSASANumber($row["sasaNumber"]);
-                $this->setStatus($row["status"]);
-                $this->setFirstName($row["firstName"]);
-                $this->setMiddleName($row["middleName"]);
-                $this->setLastName($row["lastName"]);
-                $this->setGender($row["gender"]);
-                $this->setDOB($row["dob"]);
-                $this->setAddress1($row["address1"]);
-                $this->setAddress2($row["address2"]);
-                $this->setCity($row["city"]);
+                $this->username = $row["username"];
             }
+            return true;
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function getBio()
+    {
+        return $this->bio;
+    }
+
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+
+    //Setters
+
+    public function setUserID($userID)
+    {
+        $this->userID = $userID;
+    }
+
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function setBio($bio)
+    {
+        $this->bio = $bio;
+    }
+
+    public function setWebsite($website)
+    {
+        $this->website = $website;
+    }
+
+
+    //get all details
+
+    public function getAllDetails($conn)
+    {
+        $sql = "SELECT * FROM profiles WHERE userID = :userID";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+
+        $sql2 = "SELECT username FROM users WHERE userID = :userID";
+        $stmt2 = $conn->prepare($sql2);
+        $stmt2->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            foreach ($results as $row) {
+                $this->setEmail($row['email']);
+                $this->setFirstName($row["firstName"]);
+                $this->setLastName($row["lastName"]);
+                $this->setBio($row["bio"]);
+                $this->setWebsite($row["website"]);
+            }
+
+            $this->getUserNameFromUserID($conn);
             return true;
         } catch (PDOException $e) {
             return "Query failed: " . $e->getMessage();
@@ -127,23 +162,24 @@ class users
 
     //Create user and profile
 
-    public function create($conn, $password){
-        if($this->createUser($conn,$password) && $this->createProfile($conn)) {
+    public function create($conn, $password)
+    {
+        if ($this->createUser($conn, $password) && $this->createProfile($conn)) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    private function createUser($conn, $password){
+    public function createUser($conn, $password)
+    {
         try {
             //Lets use the php bcrypt function on the password
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
             //SQL Statement
 
-            $sql = "INSERT into users VALUES (:username, password, false)";
+            $sql = "INSERT into users VALUES (null,:username, :password, false, false)";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
@@ -153,18 +189,17 @@ class users
             return true;
         } catch (PDOException $e) {
             dbClose($conn);
-            return "Create failed: " . $e->getMessage();
+            return "Create user failed: " . $e->getMessage();
         } catch (Exception $e) {
             dbClose($conn);
-            return "create failed: " . $e->getMessage();
+            return "Create user failed: " . $e->getMessage();
         }
     }
 
-    private function createProfile($conn)
+    public function createProfile($conn)
     {
         $this->getUserIDFromUsername($conn);
-        try
-        {
+        try {
             $sql = "INSERT INTO profiles VALUES (:userID, :email, :firstName, :lastName, :bio, :website)";
 
             $stmt = $conn->prepare($sql);
@@ -180,18 +215,43 @@ class users
             return true;
         } catch (PDOException $e) {
             dbClose($conn);
-            return "Create failed: " . $e->getMessage();
-        }
-        catch (Exception $e) {
+            return "Create profile failed: " . $e->getMessage();
+        } catch (Exception $e) {
             dbClose($conn);
-            return "create failed: " . $e->getMessage();
+            return "create profile failed: " . $e->getMessage();
         }
 
     }
 
+    public function updateProfile($conn){
+
+        try {
+            $sql = "UPDATE profiles SET email = :email, firstName = :firstName, lastName = :lastName, bio = :bio, website = :website WHERE albumID = :albumID";
+
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+            $stmt->bindValue(':email', $this->getEmail(), PDO::PARAM_INT);
+            $stmt->bindParam(':firstName', $this->getFirstName(), PDO::PARAM_STR);
+            $stmt->bindParam(':lastName', $this->getLastName(), PDO::PARAM_INT);
+            $stmt->bindValue(':bio', $this->getBio(), PDO::PARAM_INT);
+            $stmt->bindParam(':website', $this->getWebsite(), PDO::PARAM_STR);
+            var_dump($stmt);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            dbClose($conn);
+            return "Create profile failed: " . $e->getMessage();
+        } catch (Exception $e) {
+            dbClose($conn);
+            return "create profile failed: " . $e->getMessage();
+        }
+    }
+
     //List all users
 
-    public function listAllUsers($conn, $name = null) {
+    public function listAllUsers($conn, $name = null)
+    {
         $sql = "SELECT * FROM profiles p";
         if (!is_null($name)) {
             $sql .= " WHERE p.firstName = :name OR p.lastName = :name";
@@ -216,30 +276,111 @@ class users
 
     public function isApproved($conn)
     {
+        $sql = "SELECT userID FROM users u WHERE u.approved = 1  AND u.userID = :userID";
 
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
 
     }
 
     public function isBanned($conn)
     {
+        $sql = "SELECT userID FROM users u WHERE u.banned = 1  AND u.userID = :userID";
 
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
     }
 
     public function approveUser($conn, $userID)
     {
-
+        if (!$this->isApproved()) {
+            $sql = "UPDATE users SET approved = 1 WHERE $userID = :userID";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+            try {
+                $stmt->execute();
+                dbClose($conn);
+                return true;
+            } catch (PDOException $e) {
+                dbClose($conn);
+                return "Approval failed: " . $e->getMessage();
+            } catch (Exception $e) {
+                dbClose($conn);
+                return "Approval failed: " . $e->getMessage();
+            }
+        }
     }
 
-    public function banningUser($conn, $userID)
+    public function banningToggleUser($conn, $userID)
     {
+        //Check if the user is banned
+        //Not currently banned? Then let's ban them from the site
+        if (!$this->isBanned()) {
+            $sql = "UPDATE users SET banned = 1 WHERE $userID = :userID";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+            try {
+                $stmt->execute();
+                dbClose($conn);
+                return true;
+            } catch (PDOException $e) {
+                dbClose($conn);
+                return "Update failed: " . $e->getMessage();
+            } catch (Exception $e) {
+                dbClose($conn);
+                return "Update failed: " . $e->getMessage();
+            }
 
+        } //Otherwise we can unban them from the site
+        else if ($this->isBanned()) {
+            $sql = "UPDATE users SET banned = 0 WHERE $userID = :userID";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+            try {
+                $stmt->execute();
+                dbClose($conn);
+                return true;
+            } catch (PDOException $e) {
+                dbClose($conn);
+                return "Update failed: " . $e->getMessage();
+            } catch (Exception $e) {
+                dbClose($conn);
+                return "Update failed: " . $e->getMessage();
+            }
+        }
     }
-
 
 
     //Checking boolean methods
     //Does the user exist
-    public function doesExist($conn) {
+    public function doesExist($conn)
+    {
         $sql = "SELECT userID FROM users WHERE userID = :userID LIMIT 1";
 
         $stmt = $conn->prepare($sql);
@@ -249,6 +390,54 @@ class users
             $results = $stmt->fetchAll();
             if (count($results) > 0) {
                 return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    //No user with the same username
+    public function doesUserNameExist($conn)
+    {
+        $sql = "SELECT username FROM users WHERE username = :username LIMIT 1";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            if (count($results) > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    //Validation
+
+
+    //Login Function
+    public function Login($userID, $password, $conn)
+    {
+        try {
+            $sql = "SELECT userID, password from users WHERE userID =:userID";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':userID', htmlentities($userID), PDO::PARAM_STR);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $hash = $results[0]['password'];
+
+            if (isset($results)) {
+                if (password_verify($password, $hash)) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
