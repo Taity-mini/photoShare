@@ -24,8 +24,8 @@ if (is_null($_GET["c"])) {
     $groups = new user_groups();
     $albums = new albums();
     $photos = new photos();
-    $comments = new comments($_GET['c']);
-    $comments->setCommentID($_GET['c']);
+    $comments = new comments(htmlentities($_GET['c']));
+    $comments->setCommentID(htmlentities($_GET['c']));
     $comments->getAllDetails($conn);
 
 
@@ -38,11 +38,11 @@ if (is_null($_GET["c"])) {
 
 if (isset($_POST['btnSubmit'])) {
 
-    $comment= new comments($_GET['c']);
+    $comment= new comments(htmlentities($_GET['c']));
     $comment->getAllDetails($conn);
 
     if ((isset($_POST['txtComment']))) {
-        $comment->setComment($_POST['txtComment']);
+        $comment->setComment(htmlentities($_POST['txtComment']));
         if ($comment->update($conn)) {
             $_SESSION['update'] = true;
             header('Location: view_photo.php?p='.$comment->getPhotoID());
@@ -54,7 +54,7 @@ if (isset($_POST['btnSubmit'])) {
 
 //Delete Comment
 if (isset($_POST['btnDelete'])) {
-    $comment= new comments($_GET['c']);
+    $comment= new comments(htmlentities($_GET['c']));
     $comment->getAllDetails($conn);
     $photoID = $comment->getPhotoID();
 
@@ -131,7 +131,7 @@ if (isset($_POST['btnDelete'])) {
     $users->getAllDetails($conn);
     $users->getUserNameFromUserID($conn);
 
-    $comments = new comments($_GET['c']);
+    $comments = new comments(htmlentities($_GET['c']));
     $comments->getAllDetails($conn);
 
     echo "<h1>Edit Comment ID: " . $comments->getCommentID()."<h1>";

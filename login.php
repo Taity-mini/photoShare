@@ -21,12 +21,11 @@ if (isset($_POST['btnSubmit'])) {
     if (empty($_POST['txtUsername']) || empty($_POST['txtPassword'])) {
         $_SESSION['error'] = true;
     } else {
-
         $user = new users($_POST['txtUsername']);
         $userID = $user->getUserIDFromUsername($conn);
 
         if ($user->Login($userID, $_POST['txtPassword'], $conn)) {
-            $_SESSION['username'] = $_POST['txtUsername'];
+            $_SESSION['username'] = htmlentities($_POST['txtUsername']);
             $_SESSION['userID'] = $userID;
             header('Location: ' . $domain);
         } else {
