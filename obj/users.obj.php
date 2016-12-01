@@ -6,13 +6,11 @@ class users
 {
     private $userID, $username, $email, $firstName, $lastName, $bio, $website;
 
-
     //Constructor
     function __construct($userID = -1)
     {
         $this->userID = $userID;
     }
-
 
     //Getters
 
@@ -94,37 +92,37 @@ class users
 
     public function setUserID($userID)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     public function setUsername($username)
     {
-        $this->username = $username;
+        $this->username = htmlentities($username);
     }
 
     public function setEmail($email)
     {
-        $this->email = $email;
+        $this->email = htmlentities($email);
     }
 
     public function setFirstName($firstName)
     {
-        $this->firstName = $firstName;
+        $this->firstName = htmlentities($firstName);
     }
 
     public function setLastName($lastName)
     {
-        $this->lastName = $lastName;
+        $this->lastName = htmlentities($lastName);
     }
 
     public function setBio($bio)
     {
-        $this->bio = $bio;
+        $this->bio = htmlentities($bio);
     }
 
     public function setWebsite($website)
     {
-        $this->website = $website;
+        $this->website = htmlentities($website);
     }
 
 

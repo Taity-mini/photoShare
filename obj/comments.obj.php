@@ -43,22 +43,22 @@ class comments
 
     function setCommentID($commentID)
     {
-        $this->commentID = $commentID;
+        $this->commentID = htmlentities($commentID);
     }
 
     function setComment($comment)
     {
-        $this->comment = $comment;
+        $this->comment = htmlentities($comment);
     }
 
     function setUserID($userID)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     function setPhotoID($photoID)
     {
-        $this->photoID = $photoID;
+        $this->photoID = htmlentities($photoID);
     }
 
 

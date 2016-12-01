@@ -46,22 +46,22 @@ class user_groups
 
     public function setUserID($userID)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     public function setGroupID($groupID)
     {
-        $this->groupID = $groupID;
+        $this->groupID = htmlentities($groupID);
     }
 
     public function setGroupName($groupName)
     {
-        $this->groupName = $groupName;
+        $this->groupName = htmlentities($groupName);
     }
 
     public function setGroupDescription($groupDescription)
     {
-        $this->groupDescription = $groupDescription;
+        $this->groupDescription = htmlentities($groupDescription);
     }
 
     //Create groups for user

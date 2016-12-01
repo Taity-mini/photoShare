@@ -59,17 +59,17 @@ class photos
 
     public function setPhotoID($photoID)
     {
-        $this->photoID = $photoID;
+        $this->photoID = htmlentities($photoID);
     }
 
     public function setUserID($userID)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     public function setAlbumID($albumID)
     {
-        $this->albumID = $albumID;
+        $this->albumID = htmlentities($albumID);
     }
 
     public function setFilePath($filePath)
@@ -79,17 +79,17 @@ class photos
 
     public function setTitle($title)
     {
-        $this->title = $title;
+        $this->title = htmlentities($title);
     }
 
     public function setDescription($description)
     {
-        $this->description = $description;
+        $this->description = htmlentities($description);
     }
 
     public function setPrice($price)
     {
-        $this->price = $price;
+        $this->price = htmlentities($price);
     }
 
 

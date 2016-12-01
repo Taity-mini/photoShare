@@ -45,22 +45,22 @@ class albums
 
     public function setAlbumID($albumID)
     {
-        $this->albumID = $albumID;
+        $this->albumID = htmlentities($albumID);
     }
 
     public function setUserID($userID)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     public function setAlbumName($albumName)
     {
-        $this->albumName = $albumName;
+        $this->albumName =htmlentities($albumName);
     }
 
     public function setAlbumDescription($albumDescription)
     {
-        $this->albumDescription = $albumDescription;
+        $this->albumDescription = htmlentities($albumDescription);
     }
 
 
