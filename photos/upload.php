@@ -36,7 +36,10 @@ if (isset($_POST['btnSubmit'])) {
 
         if ($photos->uploadPhoto()) {
             if($photos->create($conn)) {
-                $_SESSION['create'] = true;
+                $_SESSION['upload'] = true;
+
+                header('Location: view_album.php?u=' . $photos->getAlbumID());
+                die();
             }
         }
     } else {
@@ -48,7 +51,7 @@ if (isset($_POST['btnSubmit'])) {
 <?php include('../inc/header.php');?>
 <!--Content-->
 <div class="grid-container">
-    <p>Upload new photo</p>
+    <h1>Upload new photo</h1>
 
     <?php
     if (isset($_SESSION['error'])) {
@@ -104,7 +107,7 @@ if (isset($_POST['btnSubmit'])) {
         </label>
         <br/>
 
-        <input type="submit" name="btnSubmit" value="Create Album">
+        <input type="submit" name="btnSubmit" value="Upload Photo">
     </form>
 </div>
 <?php include('../inc/footer.php');?>

@@ -22,6 +22,7 @@
     <h1>PhotoShare</h1>
     <nav>
         <ul>
+            <li><a href ="../">Home</a></li>
             <li><a href="../photos/">Photos</a>
                 <?php
                 if (isset($_SESSION['userID'])) {
@@ -49,19 +50,23 @@
                 $userID = $_SESSION['userID'];
                 echo '<li><a href="../profiles/view.php?u=' . $userID . '">Profile</a>
                 <ul>
-                    <li><a href="#">Update Profile</a></li>
+                    <li><a href="../profiles/update.php?u=' . $userID . '">Update Profile</a></li>
                     </ul>
                 </li>';
             }
 
             //Admin
             if (isset($_SESSION['userID'])) {
-                echo '<li><a href="#">Admin</a>
+                $userID = $_SESSION['userID'];
+                $group = new user_groups();
+                if ($group->isUserAdministrator($conn, $userID)) {
+                    echo '<li><a href="#">Admin</a>
                 <ul>
                     <li><a href="#">Approve Member</a></li>
                     <li><a href="#">Banning</a></li>
                     </ul>
                 </li>';
+                }
             }
             ?>
         </ul>

@@ -6,7 +6,7 @@ $mysqlusername = "root";
 $mysqlpassword = "";
 $mysqldatabase = "photoshare";
 $host = "localhost";
-$domain = "http://photoshare.dev";
+$domain = "http://photoshare.dev/";
 
 
 //Database connect and close functions using PDO

@@ -72,7 +72,7 @@ if (isset($_POST['btnSubmit'])) {
         unset($_SESSION['register']);
     }
     ?>
-    <form  action="" method="post">
+    <form  method="post">
         <label>
             <span><b>Username</b></span>
             <input type="text" id="txtUsername" name="txtUsername" maxlength="20"/>
