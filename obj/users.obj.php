@@ -9,7 +9,7 @@ class users
     //Constructor
     function __construct($userID = -1)
     {
-        $this->userID = $userID;
+        $this->userID = htmlentities($userID);
     }
 
     //Getters
@@ -21,7 +21,7 @@ class users
 
     public function getUserIDFromUsername($conn)
     {
-        $sql = "SELECT userID FROM users WHERE username = :username";
+        $sql = "SELECT userID FROM users WHERE username = :username LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
 
@@ -157,31 +157,64 @@ class users
         }
     }
 
+    public function getTotalCount($conn)
+    {
+        $sql = "SELECT COUNT(*) FROM users";
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetch();
+            $count = $results[0];
+            return $count;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
 
     //Create user and profile
 
-    public function create($conn, $password)
+    public function create($conn, $password, $group)
     {
-        if ($this->createUser($conn, $password) && $this->createProfile($conn)) {
+        if ($this->createUser($conn, $password, $group) && $this->createProfile($conn)) {
             return true;
         } else {
             return false;
         }
     }
 
-    public function createUser($conn, $password)
+    public function createUser($conn, $password, $group)
     {
         try {
             //Lets use the php bcrypt function on the password
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
+            $approved = "";
+            //switch case for approval:
+            switch ($group) {
+                case 1:
+                    $approved = true;
+                    break;
+                case 2:
+                    $approved = false;
+                    break;
+                case 3:
+                    $approved = true;
+                    break;
+
+                default:
+                    $approved = true;
+                    break;
+            }
+
             //SQL Statement
 
-            $sql = "INSERT into users VALUES (null,:username, :password, false, false)";
+            $sql = "INSERT into users VALUES (null,:username, :password, :group, false)";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
             $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
+            $stmt->bindParam(':group', $group, PDO::PARAM_STR);
             $stmt->execute();
 
             return true;
@@ -221,10 +254,11 @@ class users
 
     }
 
-    public function updateProfile($conn){
+    public function updateProfile($conn)
+    {
 
         try {
-            $sql = "UPDATE profiles SET email = :email, firstName = :firstName, lastName = :lastName, bio = :bio, website = :website WHERE albumID = :albumID";
+            $sql = "UPDATE profiles SET email = :email, firstName = :firstName, lastName = :lastName, bio = :bio, website = :website WHERE userID = :userID";
 
             $stmt = $conn->prepare($sql);
 
@@ -239,10 +273,10 @@ class users
             return true;
         } catch (PDOException $e) {
             dbClose($conn);
-            return "Create profile failed: " . $e->getMessage();
+            return "update profile failed: " . $e->getMessage();
         } catch (Exception $e) {
             dbClose($conn);
-            return "create profile failed: " . $e->getMessage();
+            return "update profile failed: " . $e->getMessage();
         }
     }
 
@@ -261,6 +295,19 @@ class users
             $stmt->bindParam(':name', $name, PDO::PARAM_STR);
         }
 
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            return $results;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
+    public function getLatestFiveUsers($conn)
+    {
+        $sql = "SELECT * FROM users ORDER BY userID  DESC LIMIT 5";
+        $stmt = $conn->prepare($sql);
         try {
             $stmt->execute();
             $results = $stmt->fetchAll();

@@ -14,7 +14,7 @@ class photos
     //Constructor
     function __construct($photoID = -1)
     {
-        $this->photoID = $photoID;
+        $this->photoID = htmlentities($photoID);
     }
 
     //Getters
@@ -120,6 +120,20 @@ class photos
         }
     }
 
+    public function getTotalCount($conn)
+    {
+        $sql = "SELECT COUNT(*) FROM photos";
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetch();
+            $count = $results[0];
+            return $count;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
 
     public function create($conn)
     {
@@ -145,6 +159,63 @@ class photos
             return "Create photo failed: " . $e->getMessage();
         }
     }
+
+    public function delete($conn, $albumID = null)
+    {
+        $sql = "DELETE FROM photos";
+
+        if (!is_null($albumID)) {
+            $sql .= " WHERE albumID = :albumID";
+        }
+
+        if (is_null($albumID)) {
+            $sql .= " WHERE photoID = :photoID";
+        }
+
+        $stmt = $conn->prepare($sql);
+        var_dump($stmt);
+
+        if (!is_null($albumID)) {
+            $stmt->bindParam(':albumID', $albumID, PDO::PARAM_STR);
+        }
+        if (is_null($albumID)) {
+            $stmt->bindParam(':photoID', $this->getPhotoID(), PDO::PARAM_STR);
+        }
+
+
+        try {
+            unlink($this->getFilePath());
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return "Create failed: " . $e->getMessage();
+        }
+    }
+
+    public function update($conn)
+    {
+        try {
+            $sql = "UPDATE photos SET title = :title, description = :description, price = :price WHERE photoID = :photoID";
+
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindParam(':photoID', $this->getPhotoID(), PDO::PARAM_STR);
+            //$stmt->bindValue(':filePath', $this->getFilePath(), PDO::PARAM_INT);
+            $stmt->bindParam(':title', $this->getTitle(), PDO::PARAM_STR);
+            $stmt->bindParam(':description', $this->getDescription(), PDO::PARAM_INT);
+            $stmt->bindValue(':price', $this->getPrice(), PDO::PARAM_INT);
+
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            dbClose($conn);
+            return "update photo failed: " . $e->getMessage();
+        } catch (Exception $e) {
+            dbClose($conn);
+            return "update photo failed: " . $e->getMessage();
+        }
+    }
+
 
     //Create Photo entry
 
@@ -259,10 +330,15 @@ class photos
         try {
             $stmt->execute();
             $results = $stmt->fetchAll();
-            foreach ($results as $row) {
-                $this->setFilePath($row['filePath']);
+            if (count($results) > 0) {
+                foreach ($results as $row) {
+                    $this->setFilePath($row['filePath']);
+                }
+                return true;
+            } else {
+                $this->setFilePath('../images/placeholder.jpg');
+                return false;
             }
-            return true;
         } catch (PDOException $e) {
             return "Database query failed: " . $e->getMessage();
         }
@@ -272,7 +348,6 @@ class photos
     {
         $sql = "SELECT * FROM photos ORDER BY photoID  DESC LIMIT 5";
         $stmt = $conn->prepare($sql);
-        //$stmt->bindParam(':albumID', $this->getAlbumID(), PDO::PARAM_STR);
         try {
             $stmt->execute();
             $results = $stmt->fetchAll();

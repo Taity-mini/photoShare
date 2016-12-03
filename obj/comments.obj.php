@@ -12,7 +12,7 @@ class comments
 
     function __construct($commentID = -1)
     {
-        $this->commentID = $commentID;
+        $this->commentID = htmlentities($commentID);
     }
 
 
@@ -87,7 +87,8 @@ class comments
     }
 
 
-    public function update($conn){
+    public function update($conn)
+    {
         $sql = "UPDATE comments SET comment = :comment  WHERE commentID = :commentID";
         $stmt = $conn->prepare($sql);
 
@@ -102,12 +103,27 @@ class comments
         }
     }
 
-    public function delete($conn)
+    public function delete($conn, $photoID = null)
     {
-        $sql = "DELETE FROM comments WHERE commentID = :commentID";
+        $sql = "DELETE FROM comments";
+
+        if (!is_null($photoID)) {
+            echo $photoID;
+            $sql .= " WHERE photoID = :photoID";
+        }
+
+        if (is_null($photoID)) {
+            $sql .= " WHERE commentID = :commentID";
+        }
+
         $stmt = $conn->prepare($sql);
 
-        $stmt->bindParam(':commentID', $this->getCommentID(), PDO::PARAM_STR);
+        if (!is_null($photoID)) {
+            $stmt->bindParam(':photoID', $photoID, PDO::PARAM_STR);
+        }
+        if (is_null($photoID)) {
+            $stmt->bindParam(':commentID', $this->getCommentID(), PDO::PARAM_STR);
+        }
 
         try {
             $stmt->execute();
@@ -135,6 +151,20 @@ class comments
             return true;
         } catch (PDOException $e) {
             return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    public function getTotalCount($conn)
+    {
+        $sql = "SELECT COUNT(*) FROM comments";
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetch();
+            $count = $results[0];
+            return $count;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
         }
     }
 

@@ -14,8 +14,8 @@ class user_groups
     // ***** CONSTRUCTOR *****
     function __construct($userID = "zzz", $groupID = -1)
     {
-        $this->userID = $userID;
-        $this->groupID = $groupID;
+        $this->userID = htmlentities($userID);
+        $this->groupID = htmlentities($groupID);
     }
 
 
