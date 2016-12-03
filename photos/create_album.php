@@ -40,7 +40,7 @@ if (isset($_POST['btnSubmit'])) {
 <?php include('../inc/header.php');?>
 <!--Content-->
 <div class="grid-container">
-    <p>Create new album</p>
+    <h1>Create new album</h1>
 
     <?php
     if (isset($_SESSION['error'])) {

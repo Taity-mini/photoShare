@@ -13,7 +13,7 @@ class albums
     //Constructor
     function __construct($albumID = -1)
     {
-        $this->albumID = $albumID;
+        $this->albumID = htmlentities($albumID);
     }
 
     //Getters
@@ -55,7 +55,7 @@ class albums
 
     public function setAlbumName($albumName)
     {
-        $this->albumName =htmlentities($albumName);
+        $this->albumName = htmlentities($albumName);
     }
 
     public function setAlbumDescription($albumDescription)
@@ -64,11 +64,11 @@ class albums
     }
 
 
-
     //Main Methods
 
 
-    public function getAllDetails($conn){
+    public function getAllDetails($conn)
+    {
         $sql = "SELECT * FROM albums WHERE albumID = :albumID";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':albumID', $this->getAlbumID(), PDO::PARAM_STR);
@@ -88,6 +88,19 @@ class albums
         }
     }
 
+    public function getTotalCount($conn)
+    {
+        $sql = "SELECT COUNT(*) FROM albums";
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetch();
+            $count = $results[0];
+            return $count;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
 
 
     public function create($conn)
@@ -101,7 +114,6 @@ class albums
             $stmt->bindParam(':albumName', $this->getAlbumName(), PDO::PARAM_STR);
             $stmt->bindParam(':albumDescription', $this->getAlbumDescription(), PDO::PARAM_STR);
             $stmt->execute();
-            echo "Statement working";
             return true;
         } catch (PDOException $e) {
             //dbClose($conn);
@@ -132,9 +144,38 @@ class albums
         }
     }
 
+    public function delete($conn, $userID = null)
+    {
+        $sql = "DELETE FROM albums";
+
+        if (!is_null($userID)) {
+            $sql .= " WHERE userID = :userID";
+        }
+
+        if (is_null($userID)) {
+            $sql .= " WHERE albumID = :albumID";
+        }
+
+        $stmt = $conn->prepare($sql);
+
+        if (!is_null($userID)) {
+            $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
+        }
+
+        $stmt->bindParam(':albumID', $this->getAlbumID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            return "Create failed: " . $e->getMessage();
+        }
+    }
+
 
 //List all albums in the database and from user from optional parameter
-    public function listAllAlbums($conn, $userID = null){
+    public function listAllAlbums($conn, $userID = null)
+    {
         $sql = "SELECT * FROM albums a";
 
         if (!is_null($userID)) {
@@ -156,7 +197,8 @@ class albums
         }
     }
 
-    public function listAllAlbumSelect($conn, $userID = null){
+    public function listAllAlbumSelect($conn, $userID = null)
+    {
         $sql = "SELECT albumID, albumName FROM albums";
 
         if (!is_null($userID)) {
@@ -184,8 +226,22 @@ class albums
         }
     }
 
+    public function getLatestFiveAlbums($conn)
+    {
+        $sql = "SELECT * FROM albums ORDER BY albumID  DESC LIMIT 5";
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            return $results;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
 
-    public function doesExist($conn){
+
+    public function doesExist($conn)
+    {
         $sql = "SELECT albumID FROM albums WHERE albumID = :albumID LIMIT 1";
 
         $stmt = $conn->prepare($sql);
@@ -202,6 +258,7 @@ class albums
             return "Query failed: " . $e->getMessage();
         }
     }
+
 
 }
 
