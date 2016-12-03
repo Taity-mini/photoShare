@@ -60,12 +60,7 @@
                 $userID = $_SESSION['userID'];
                 $group = new user_groups();
                 if ($group->isUserAdministrator($conn, $userID)) {
-                    echo '<li><a href="#">Admin</a>
-                <ul>
-                    <li><a href="#">Approve Member</a></li>
-                    <li><a href="#">Banning</a></li>
-                    </ul>
-                </li>';
+                    echo '<li><a href="../admin/">Admin</a></li>';
                 }
             }
             ?>
