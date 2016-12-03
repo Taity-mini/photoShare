@@ -362,10 +362,10 @@ class users
         }
     }
 
-    public function approveUser($conn, $userID)
+    public function approveUser($conn)
     {
-        if (!$this->isApproved()) {
-            $sql = "UPDATE users SET approved = 1 WHERE $userID = :userID";
+        if (!$this->isApproved($conn)) {
+            $sql = "UPDATE users SET approved = 1 WHERE userID = :userID";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
             try {
