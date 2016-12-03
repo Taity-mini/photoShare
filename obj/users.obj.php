@@ -209,12 +209,13 @@ class users
 
             //SQL Statement
 
-            $sql = "INSERT into users VALUES (null,:username, :password, :group, false)";
+            $sql = "INSERT into users VALUES (null,:username, :password, :group, :approve)";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
             $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
             $stmt->bindParam(':group', $group, PDO::PARAM_STR);
+            $stmt->bindParam(':approve', $approved, PDO::PARAM_STR);
             $stmt->execute();
 
             return true;
@@ -256,7 +257,6 @@ class users
 
     public function updateProfile($conn)
     {
-
         try {
             $sql = "UPDATE profiles SET email = :email, firstName = :firstName, lastName = :lastName, bio = :bio, website = :website WHERE userID = :userID";
 
@@ -386,8 +386,8 @@ class users
     {
         //Check if the user is banned
         //Not currently banned? Then let's ban them from the site
-        if (!$this->isBanned()) {
-            $sql = "UPDATE users SET banned = 1 WHERE $userID = :userID";
+        if (!$this->isBanned($conn)) {
+            $sql = "UPDATE users SET banned = 1 WHERE userID = :userID";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
             try {
@@ -403,8 +403,8 @@ class users
             }
 
         } //Otherwise we can unban them from the site
-        else if ($this->isBanned()) {
-            $sql = "UPDATE users SET banned = 0 WHERE $userID = :userID";
+        else if ($this->isBanned($conn)) {
+            $sql = "UPDATE users SET banned = 0 WHERE userID = :userID";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
             try {
