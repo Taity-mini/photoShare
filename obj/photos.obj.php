@@ -357,4 +357,26 @@ class photos
         }
     }
 
+    //Searching Functions
+    public function search($conn, $field, $query){
+        try {
+            $field = "`".str_replace("`","``",$field)."`";
+            $sql = "SELECT * FROM `photos` WHERE $field LIKE :query";
+            $stmt = $conn->prepare($sql);
+
+            //$stmt->bindParam(':field', $field, PDO::PARAM_STR);
+            $stmt->bindParam(':query', $query, PDO::PARAM_STR);
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            if (isset($results)){
+                return $results;
+            }else{
+                return false;
+            }
+
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
 }

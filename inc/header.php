@@ -33,9 +33,10 @@ if($pos != true) {
 
     <!--Jquery Library-->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
+    <script  src = "../inc/functions.js"></script>
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+
     <![endif]-->
 </head>
 <body>
@@ -50,7 +51,6 @@ if($pos != true) {
                     echo '<ul>
                     <li><a href="../photos/upload.php">Upload</a></li>
                     <li><a href="../photos/create_album.php">Create Album</a></li>
-                    <li><a href="../photos/purchase.php">Purchase</a></li>
                 </ul>';
                 }
                 ?>
@@ -63,7 +63,7 @@ if($pos != true) {
                 echo '<li><a href="../register.php">Registration</a></li>';
             }
             ?>
-            <li><a href="#">Search</a></li>
+            <li><a href="../search/">Search</a></li>
             <?php
 
             //User Profile
