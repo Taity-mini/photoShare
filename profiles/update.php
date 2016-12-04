@@ -13,13 +13,6 @@ require_once('../obj/users.obj.php');
 require_once('../obj/users.groups.obj.php');
 $conn = dbConnect();
 
-if (!isset($_SESSION['userID'])) {
-    header('Location:' . $domain);
-    exit;
-}
-
-
-
 
 if (is_null($_GET["u"])) {
     header('Location:' . $domain . '404.php');
@@ -31,14 +24,18 @@ if (is_null($_GET["u"])) {
     $groups->setUserID($_GET["u"]);
     $groups->getAllDetails($conn);
 
-
-    if(($_SESSION['userID'] !== $_GET["u"]) && (!$groups->isUserAdministrator($conn,$users->getUserID()))){
-        header('Location:' . $domain);
-        exit;
+    if (isset($_SESSION['userID'])) {
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ((($_SESSION['userID'] !== $_GET["u"])) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+            header('Location: ../message.php?id=badaccess');
+        }
+    } else {
+        header('Location: ../message.php?id=badaccess');
     }
 
     if (!$users->doesExist($conn)) {
-        echo "User doesn't exist";
+        header('Location: ../message.php?id=nouser');
         exit;
     }
 }

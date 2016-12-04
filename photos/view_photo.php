@@ -20,41 +20,51 @@ if (is_null($_GET["p"])) {
     header('Location:' . $domain . '404.php');
     exit;
 } else {
-    $users = new Users();
+
     $groups = new user_groups();
     $albums = new albums();
     $photos = new photos($_GET["p"]);
 
 
     if (!$photos->doesExist($conn)) {
-        echo "Photo doesn't exist";
+        header('Location: ../message.php?id=nophoto');
         exit;
     }
+
+    if(isset($_SESSION['userID']))
+    {
+        $users = new Users(($_SESSION['userID']));
+
+    }
+
 
     if (isset($_POST['btnEdit'])) {
         header('Location: edit_photo.php?p='.$photos->getPhotoID());
     }
-}
-
-if (isset($_POST['btnSubmit'])) {
-
-    $user = new users($_SESSION['userID']);
-    $user->getAllDetails($conn);
-    $comment = new comments();
 
 
-    if ((isset($_POST['txtComment']))) {
-        $comment->setPhotoID($_GET['p']);
-        $comment->setUserID($user->getUserID());
-        $comment->setComment($_POST['txtComment']);
+    if (isset($_POST['btnSubmit'])) {
 
-        if ($comment->create($conn)) {
-            $_SESSION['create'] = true;
+        $user = new users($_SESSION['userID']);
+        $user->getAllDetails($conn);
+        $comment = new comments();
+
+
+        if ((isset($_POST['txtComment']))) {
+            $comment->setPhotoID($_GET['p']);
+            $comment->setUserID($user->getUserID());
+            $comment->setComment($_POST['txtComment']);
+
+            if ($comment->create($conn)) {
+                $_SESSION['create'] = true;
+            }
+        } else {
+            $_SESSION['error'] = true;
         }
-    } else {
-        $_SESSION['error'] = true;
     }
 }
+
+
 
 
 ?>

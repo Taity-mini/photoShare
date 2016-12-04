@@ -16,6 +16,18 @@ require_once('../obj/albums.obj.php');
 
 $conn = dbConnect();
 
+if (isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+    $group = new user_groups();
+    if (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID)) {
+        header('Location: ../message.php?id=badaccess');
+        exit;
+    }
+} else {
+    header('Location: ../message.php?id=badaccess');
+    exit;
+}
+
 if (isset($_POST['btnSubmit'])) {
 
     $user = new users($_SESSION['userID']);

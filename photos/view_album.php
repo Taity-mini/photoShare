@@ -24,9 +24,10 @@ if (is_null($_GET["u"])) {
     $albums = new albums($_GET["u"]);
 
     if (!$albums->doesExist($conn)) {
-        echo "album doesn't exist";
+        header('Location: ../message.php?id=noalbum');
         exit;
     }
+
 
     if (isset($_POST['btnEdit'])) {
             header('Location: edit_album.php?u='.$albums->getAlbumID());

@@ -16,7 +16,7 @@ if (is_null($_GET["u"])) {
     $groups = new user_groups();
 
     if (!$users->doesExist($conn)) {
-        echo "user doesn't exist";
+        header('Location: ../message.php?id=nouser');
         exit;
     }
 }

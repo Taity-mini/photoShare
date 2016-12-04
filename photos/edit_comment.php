@@ -29,9 +29,21 @@ if (is_null($_GET["c"])) {
     $comments->getAllDetails($conn);
 
     if (!$comments->doesExist($conn)) {
-        echo "Comment doesn't exist";
+        header('Location: ../message.php?id=nocomment');
         exit;
     }
+
+    if(isset($_SESSION['userID']))
+    {
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ((($_SESSION['userID'] !==  $comments->getUserID())) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+            header('Location: ../message.php?id=badaccess');
+        }
+    } else{
+        header('Location: ../message.php?id=badaccess');
+    }
+
 }
 
 if (isset($_POST['btnSubmit'])) {

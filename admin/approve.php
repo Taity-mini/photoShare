@@ -29,13 +29,13 @@ if (is_null($_GET["u"])) {
     $groups->getAllDetails($conn);
 
 
-    if (($_SESSION['userID'] !== $_GET["u"]) && (!$groups->isUserAdministrator($conn, $users->getUserID()))) {
+    if (($_SESSION['userID'] == $_GET["u"]) && (!$groups->isUserAdministrator($conn, $users->getUserID()))) {
         header('Location:' . $domain);
         exit;
     }
 
     if (!$users->doesExist($conn)) {
-        echo "User doesn't exist";
+        header('Location: ../message.php?id=nouser');
         exit;
     }
 }
@@ -76,8 +76,6 @@ if (isset($_POST['btnBack'])) {
 
 
     echo "<h1>Approve UserID: " . $users->getUserID() . "<h1>";
-
-
     ?>
 
     <form method="post">

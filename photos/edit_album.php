@@ -16,55 +16,77 @@ require_once('../obj/photos.obj.php');
 require_once('../obj/comments.obj.php');
 
 $conn = dbConnect();
+if (is_null($_GET["u"])) {
+    header('Location:' . $domain . '404.php');
+    exit;
+} else {
 
-if (isset($_POST['btnSubmit'])) {
 
-    $user = new users($_SESSION['userID']);
-    $user->getAllDetails($conn);
-    $albums = new albums($_GET["u"]);
+    if (isset($_SESSION['userID'])) {
+        $albums = new albums($_GET["u"]);
 
-    if (isset($_POST['txtName']) && (isset($_POST['txtDescription']))) {
-        $albums->setAlbumName(htmlentities($_POST['txtName']));
-        $albums->setAlbumDescription(htmlentities($_POST['txtDescription']));
+        if (!$albums->doesExist($conn)) {
+            header('Location: ../message.php?id=noalbum');
+            exit;
+        }
 
-        if ($albums->update($conn)) {
-            $_SESSION['update'] = true;
-            header('Location: view_album.php?u=' . $albums->getAlbumID());
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ((($_SESSION['userID'] !==  $albums->getUserID())) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+            header('Location: ../message.php?id=badaccess');
         }
     } else {
-        $_SESSION['error'] = true;
+        header('Location: ../message.php?id=badaccess');
+    }
+
+    if (isset($_POST['btnSubmit'])) {
+
+        $user = new users($_SESSION['userID']);
+        $user->getAllDetails($conn);
+        $albums = new albums($_GET["u"]);
+
+        if (isset($_POST['txtName']) && (isset($_POST['txtDescription']))) {
+            $albums->setAlbumName(htmlentities($_POST['txtName']));
+            $albums->setAlbumDescription(htmlentities($_POST['txtDescription']));
+
+            if ($albums->update($conn)) {
+                $_SESSION['update'] = true;
+                header('Location: view_album.php?u=' . $albums->getAlbumID());
+            }
+        } else {
+            $_SESSION['error'] = true;
+        }
+    }
+
+    if (isset($_POST['btnDelete'])) {
+
+        $albums = new albums(htmlentities($_GET["u"]));
+        $albums->getAllDetails($conn);
+        $photos = new photos();
+        $photos->setAlbumID($albums->getAlbumID());
+
+        //Delete all comments on photos in the album
+        if ($photo_listing = $photos->listPhotoAlbum($conn)) {
+            foreach ($photo_listing as $row) {
+                $comment = new comments();
+                $comment->delete($conn, $row['photoID']);
+            }
+        } else {
+            $_SESSION['error'] = true;
+        }
+
+        //Delete all photos from the album
+        if ($photos->delete($conn, $albums->getAlbumID())) {
+            //Finally delete album
+            if ($albums->delete($conn)) {
+                $_SESSION['delete'] = true;
+                header('Location: ../photos/');
+            }
+        } else {
+            $_SESSION['error'] = true;
+        }
     }
 }
-
-if (isset($_POST['btnDelete'])) {
-
-    $albums = new albums(htmlentities($_GET["u"]));
-    $albums->getAllDetails($conn);
-    $photos = new photos();
-    $photos->setAlbumID($albums->getAlbumID());
-
-    //Delete all comments on photos in the album
-    if ($photo_listing = $photos->listPhotoAlbum($conn)) {
-        foreach ($photo_listing as $row) {
-            $comment = new comments();
-            $comment->delete($conn, $row['photoID']);
-        }
-    } else {
-        $_SESSION['error'] = true;
-    }
-
-    //Delete all photos from the album
-    if ($photos->delete($conn, $albums->getAlbumID())) {
-        //Finally delete album
-        if ($albums->delete($conn)) {
-            $_SESSION['delete'] = true;
-            header('Location: ../photos/');
-        }
-    } else {
-        $_SESSION['error'] = true;
-    }
-}
-
 ?>
 
 <?php include('../inc/header.php'); ?>

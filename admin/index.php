@@ -15,6 +15,10 @@ require_once('../obj/albums.obj.php');
 require_once('../obj/photos.obj.php');
 $conn = dbConnect();
 
+if (!isset($_SESSION['userID'])) {
+    header('Location:' . $domain);
+    exit;
+}
 
 ?>
 

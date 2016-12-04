@@ -22,10 +22,21 @@ if (is_null($_GET["p"])) {
 } else {
 
     $photos = new photos($_GET["p"]);
+    $photos->getAllDetails($conn);
+    if(isset($_SESSION['userID']))
+    {
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ((($_SESSION['userID'] !==  $photos->getUserID())) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+            header('Location: ../message.php?id=badaccess');
+        }
+    } else{
+        header('Location: ../message.php?id=badaccess');
+    }
 
 
     if (!$photos->doesExist($conn)) {
-        echo "Photo doesn't exist";
+        header('Location: ../message.php?id=nophoto');
         exit;
     }
 
