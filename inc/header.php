@@ -1,3 +1,24 @@
+<?php
+//Banning and approval check
+
+//Checks if on message page to avoid redirect loop
+$url = $_SERVER["REQUEST_URI"];
+$pos = strrpos($url, "message.php");
+
+//If not on message page then carry out checks
+if($pos != true) {
+
+    if (isset($_SESSION['userID'])) {
+        $users = new Users(($_SESSION['userID']));
+        if (!$users->isApproved($conn)) {
+            header('Location: ../message.php?id=approval');
+        }
+        if ($users->isBanned($conn)) {
+            header('Location: ../message.php?id=banned');
+        }
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -22,7 +43,7 @@
     <h1>PhotoShare</h1>
     <nav>
         <ul>
-            <li><a href ="../">Home</a></li>
+            <li><a href="../">Home</a></li>
             <li><a href="../photos/">Photos</a>
                 <?php
                 if (isset($_SESSION['userID'])) {
