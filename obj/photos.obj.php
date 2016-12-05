@@ -358,9 +358,10 @@ class photos
     }
 
     //Searching Functions
-    public function search($conn, $field, $query){
+    public function search($conn, $field, $query)
+    {
         try {
-            $field = "`".str_replace("`","``",$field)."`";
+            $field = "`" . str_replace("`", "``", $field) . "`";
             $sql = "SELECT * FROM `photos` WHERE $field LIKE :query";
             $stmt = $conn->prepare($sql);
 
@@ -368,14 +369,72 @@ class photos
             $stmt->bindParam(':query', $query, PDO::PARAM_STR);
             $stmt->execute();
             $results = $stmt->fetchAll();
-            if (isset($results)){
+            if (isset($results)) {
                 return $results;
-            }else{
+            } else {
                 return false;
             }
 
         } catch (PDOException $e) {
             return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    //Purchasing Functions
+
+    public function purchase($conn)
+    {
+        if (!$this->isPurchased($conn)) {
+
+            try {
+                $sql = "INSERT into purchases VALUES (:userID, :photoID)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+                $stmt->bindParam(':photoID', $this->getPhotoID(), PDO::PARAM_STR);
+
+
+                $stmt->execute();
+                //$results = $stmt->fetchAll();
+                return true;
+            } catch (PDOException $e) {
+                return "Query failed: " . $e->getMessage();
+            }
+        }
+    }
+
+    public function isPurchased($conn)
+    {
+        $sql = "SELECT * FROM purchases WHERE userID = :userID and photoID = :photoID";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $this->getUserID(), PDO::PARAM_STR);
+        $stmt->bindParam(':photoID', $this->getPhotoID(), PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            //$results = $stmt->fetchAll();
+
+            if ($stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            return "Query failed: " . $e->getMessage();
+        }
+    }
+
+    public function listPurchases($conn, $userID){
+        $sql = "SELECT photoID FROM purchases where $userID = :userID";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            return $results;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
         }
     }
 

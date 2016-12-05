@@ -242,7 +242,6 @@ class users
             $stmt->bindParam(':lastName', $this->getLastName(), PDO::PARAM_INT);
             $stmt->bindValue(':bio', $this->getBio(), PDO::PARAM_INT);
             $stmt->bindParam(':website', $this->getWebsite(), PDO::PARAM_STR);
-            var_dump($stmt);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {

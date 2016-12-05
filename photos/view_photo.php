@@ -31,15 +31,18 @@ if (is_null($_GET["p"])) {
         exit;
     }
 
-    if(isset($_SESSION['userID']))
-    {
+    if (isset($_SESSION['userID'])) {
         $users = new Users(($_SESSION['userID']));
 
     }
 
 
     if (isset($_POST['btnEdit'])) {
-        header('Location: edit_photo.php?p='.$photos->getPhotoID());
+        header('Location: edit_photo.php?p=' . $photos->getPhotoID());
+    }
+
+    if (isset($_POST['btnPurchase'])) {
+        header('Location: purchase.php?p=' . $photos->getPhotoID());
     }
 
 
@@ -63,8 +66,6 @@ if (is_null($_GET["p"])) {
         }
     }
 }
-
-
 
 
 ?>
@@ -97,13 +98,33 @@ if (is_null($_GET["p"])) {
         echo "</br>";
         echo "Price £: " . $photos->getPrice();
         echo "</br>";
-        ?>
 
-        <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
-            <input type="submit" name="btnEdit" value="Edit Photo">
-        </form>
+        if (isset($_SESSION['userID'])) {
+            $userID = $_SESSION['userID'];
+            if ((($userID == $photos->getUserID()) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
 
-        <?php
+                ?>
+
+
+                <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
+                    <input type="submit" name="btnEdit" value="Edit Photo">
+                </form>
+                <?php
+            }
+            $photos->setUserID($userID);
+            if ($photos->isPurchased($conn)) {
+                echo "<b>You have purchased this photo</b>";
+            } else if (((!$photos->isPurchased($conn)) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
+
+                ?>
+
+                <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
+                    <input type="submit" name="btnPurchase" value="Purchase Photo">
+                </form>
+
+                <?php
+            }
+        }
         echo "<h2>EXIF Data</h2>";
 
         $photos->getExifData();
