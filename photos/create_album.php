@@ -15,13 +15,15 @@ require_once('../obj/users.groups.obj.php');
 require_once('../obj/albums.obj.php');
 
 $conn = dbConnect();
-
+$access = false;
 if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
     $group = new user_groups();
-    if (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID)) {
+    if ($group->isUserAdministrator($conn, $userID) || $group->isUserPhotographer($conn, $userID)) {
+        $access = true;
+    }
+    else if(!$access){
         header('Location: ../message.php?id=badaccess');
-        exit;
     }
 } else {
     header('Location: ../message.php?id=badaccess');

@@ -193,28 +193,28 @@ class users
             //switch case for approval:
             switch ($group) {
                 case 1:
-                    $approved = true;
+                    $approved = 1;
                     break;
                 case 2:
-                    $approved = false;
+                    $approved = 0;
                     break;
                 case 3:
-                    $approved = true;
+                    $approved = 1;
                     break;
 
                 default:
-                    $approved = true;
+                    $approved = 1;
                     break;
             }
 
             //SQL Statement
 
-            $sql = "INSERT into users VALUES (null,:username, :password, :group, :approve)";
+            $sql = "INSERT into users VALUES (null,:username, :password, :approve, FALSE )";
 
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':username', $this->getUsername(), PDO::PARAM_STR);
             $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
-            $stmt->bindParam(':group', $group, PDO::PARAM_STR);
+            //$stmt->bindParam(':group', $group, PDO::PARAM_STR);
             $stmt->bindParam(':approve', $approved, PDO::PARAM_STR);
             $stmt->execute();
 

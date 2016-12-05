@@ -58,7 +58,7 @@ if (is_null($_GET["u"])) {
         echo "Group: " . $groups->getGroupName();
 
 
-        if ($group->isUserPhotographer($conn, $users->getUserID())) {
+        if ($groups->isUserPhotographer($conn, $users->getUserID())) {
 
             $albums = new albums();
 
@@ -96,7 +96,7 @@ if (is_null($_GET["u"])) {
             }
         }
 
-        if ($group->isUserShopper($conn, $users->getUserID())) {
+        if ($groups->isUserShopper($conn, $users->getUserID())) {
             $photos = new Photos();
             $purchase_listing = $photos->listPurchases($conn, $users->getUserID());
             echo "<h2>Purchases [" . count($purchase_listing) . "]</h2>";

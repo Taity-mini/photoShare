@@ -16,6 +16,7 @@ require_once('../obj/photos.obj.php');
 require_once('../obj/comments.obj.php');
 
 $conn = dbConnect();
+$access = false;
 if (is_null($_GET["u"])) {
     header('Location:' . $domain . '404.php');
     exit;
@@ -32,7 +33,10 @@ if (is_null($_GET["u"])) {
 
         $userID = $_SESSION['userID'];
         $group = new user_groups();
-        if ((($_SESSION['userID'] !==  $albums->getUserID())) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+        if ($group->isUserAdministrator($conn, $userID) || $group->isUserPhotographer($conn, $userID)) {
+            $access = true;
+        }
+        else if(!$access){
             header('Location: ../message.php?id=badaccess');
         }
     } else {

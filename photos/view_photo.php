@@ -96,9 +96,12 @@ if (is_null($_GET["p"])) {
             </a>';
 
         echo '<div class="highslide-caption">';
-        //echo 'Title: '.$row['title'] . '<br>';
-        //echo 'Description: '.$row['description'] . '<br>';
+        echo 'Title: '.$photos->getTitle() . '<br>';
+        echo 'Description: '.$photos->getDescription() . '<br>';
         //echo '<b><a href="' . $photolink . '">View the Photo</a></b>';
+
+
+
         echo '</div>';
         echo '</div>';
 
@@ -126,8 +129,12 @@ if (is_null($_GET["p"])) {
                 <td><?php echo $albums->getAlbumName(); ?></td>
             </tr>
             <tr>
-                <td>Description</td>
+                <td>Album Description</td>
                 <td><?php echo $albums->getAlbumDescription(); ?></td>
+            </tr>
+            <tr>
+                <td>Photo Description</td>
+                <td><?php echo $photos->getDescription(); ?></td>
             </tr>
             <tr>
                 <td>Price:</td>
@@ -150,7 +157,7 @@ if (is_null($_GET["p"])) {
                         $photos->setUserID($userID);
                         if ($photos->isPurchased($conn)) {
                             echo "<b>You have purchased this photo</b>";
-                        } else if (((!$photos->isPurchased($conn)) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
+                        } else if (((!$photos->isPurchased($conn)) && $group->isUserShopper($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
 
                             ?>
 

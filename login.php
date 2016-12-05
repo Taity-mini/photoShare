@@ -23,10 +23,11 @@ if (isset($_POST['btnSubmit'])) {
         $user = new users();
         $user->setUsername($_POST['txtUsername']);
         $userID = $user->getUserIDFromUsername($conn);
+        var_dump($userID);
 
-        if ($user->Login($userID, $_POST['txtPassword'], $conn)) {
+        if ($user->Login($user->getUserID(), $_POST['txtPassword'], $conn)) {
             $_SESSION['username'] = htmlentities($_POST['txtUsername']);
-            $_SESSION['userID'] = $userID;
+            $_SESSION['userID'] =  $user->getUserID();
 
             $user->getAllDetails($conn);
 

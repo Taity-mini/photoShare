@@ -156,7 +156,7 @@ class user_groups
 
     public function isUserAdministrator($conn, $userID)
     {
-        $sql = "SELECT userID FROM users u, user_groups ug, groups g WHERE ug.groupID = g.groupID AND r.id = 1 AND ug.userID = :userID";
+        $sql = "SELECT ug.userID FROM user_groups ug, groups g WHERE ug.groupID = g.groupID AND ug.groupID = 1 AND ug.userID = :userID";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
@@ -178,7 +178,7 @@ class user_groups
 
     public function isUserPhotographer($conn, $userID)
     {
-        $sql = "SELECT userID FROM users u, user_groups ug, groups g WHERE ug.groupID = g.groupID AND r.id = 2 AND ug.userID = :userID";
+        $sql = "SELECT ug.userID FROM user_groups ug, groups g WHERE ug.groupID = g.groupID AND ug.groupID = 2 AND ug.userID = :userID";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
@@ -199,7 +199,7 @@ class user_groups
 
     public function isUserShopper($conn, $userID)
     {
-        $sql = "SELECT userID FROM users u, user_groups ug, groups g WHERE ug.groupID = g.groupID AND r.id = 3 AND ug.userID = :userID";
+        $sql = "SELECT ug.userID FROM user_groups ug, groups g WHERE ug.groupID = g.groupID AND ug.groupID = 3 AND ug.userID = :userID";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);

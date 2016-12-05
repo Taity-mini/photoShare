@@ -93,7 +93,7 @@ if (is_null($_GET["u"])) {
                 $photolink = "../photos/view_photo.php?p=" . $row['photoID'];
 
                 echo '<a href="' . $row['filePath'] . '" class="highslide" onclick="return hs.expand(this)">
-                <img style="width:350px; height:350px;" src="' . $row['filePath'] . '" alt="Highslide JS"
+                <img style="width:250px; height:250px;" src="' . $row['filePath'] . '" alt="Highslide JS"
                      title="Click to enlarge" />
             </a>';
                 echo '<div class="highslide-caption">';
