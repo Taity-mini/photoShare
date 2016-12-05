@@ -14,6 +14,10 @@ require_once('../obj/users.groups.obj.php');
 require_once('../obj/photos.obj.php');
 $conn = dbConnect();
 
+
+
+
+
 if (!isset($_SESSION['userID'])) {
     header('Location:' . $domain);
     exit;
@@ -48,22 +52,21 @@ if (is_null($_GET["p"])) {
     }
 }
 
-if (isset($_POST['btnSubmit'])) {
+if (isset($_SESSION['payment'])) {
 
-    $conn = dbConnect();
-    $photo = new photos(htmlentities($_GET['p']));
-    $photo->getAllDetails($conn);
-    $photo->setUserID($_SESSION['userID']);
-    //Create user in the database
+                    $conn = dbConnect();
+                    $photo = new photos(htmlentities($_GET['p']));
+                    $photo->getAllDetails($conn);
+                    $photo->setUserID($_SESSION['userID']);
+                    //Create user in the database
 
-    if ($photos->purchase($conn)) {
-        $_SESSION['purchase'] = true;
+                    if ($photos->purchase($conn)) {
+                        $_SESSION['purchase'] = true;
 
-        header('Location: ../photos/view_photo.php?p=' . $photos->getPhotoID());
-    } else {
-        $_SESSION['purchaseError'] = true;
-    }
-
+                        header('Location: ../photos/view_photo.php?p=' . $photos->getPhotoID());
+                    } else {
+                        $_SESSION['purchaseError'] = true;
+                    }
 }
 
 //Go back to admin page
@@ -71,7 +74,15 @@ if (isset($_POST['btnBack'])) {
     header('Location: ../photos/view_photo.php?p=' . $photos->getPhotoID());
 }
 ?>
-<?php include('../inc/header.php'); ?>
+
+<?php include('../inc/header.php');
+
+$conn = dbConnect();
+
+$photo_purchase = new photos(htmlentities($_GET['p']));
+$photo_purchase->getAllDetails($conn);
+?>
+
 
 <div class="grid-container">
     <?php
@@ -90,11 +101,60 @@ if (isset($_POST['btnBack'])) {
         echo "<img style='width:550px; height:550px;' src='" . $photos->getFilePath() . "' /></br>";
         echo '<label>Are you sure you want to purchase this photo for: £' . $photos->getPrice() . '?';
         echo '</br>';
-        echo '<input type="submit" name="btnSubmit" value="Purchase Photo">';
-
+        //echo '<input type="submit" name="btnSubmit" value="Purchase Photo">';
+        echo '<div id="paypal-button"></div>';
         ?>
         </label>
         <input type="submit" name="btnBack" value="Go Back">
     </form>
+
+    <!--Paypal code-->
+    <script src="https://www.paypalobjects.com/api/checkout.js" data-version-4></script>
+    <script>
+        paypal.Button.render({
+
+            env: 'sandbox', // Optional: specify 'sandbox' environment
+
+            client: {
+                sandbox:    'AWU9tRB6ITyXkaStodgczoj1WXtdZFYiAyBboSAIFHzqM7dzrijD0uKx6tgCzMVCQoVJU0UmvXefuut1',
+                production: 'xxxxxxxxx'
+            },
+
+            payment: function() {
+
+                var env    = this.props.env;
+                var client = this.props.client;
+
+                return paypal.rest.payment.create(env, client, {
+                    transactions: [
+                        {
+                            amount: { total: '<?php echo $photo_purchase->getPrice() ?>', currency: 'GBP' }
+                        }
+                    ]
+                });
+            },
+
+            commit: true, // Optional: show a 'Pay Now' button in the checkout flow
+
+            onAuthorize: function(data, actions) {
+
+                // Optional: display a confirmation page here
+
+                return actions.payment.execute().then(function() {
+
+                    $.post("../photos/payment.php", {
+                        id: "<?php echo $photo_purchase->getPhotoID() ?>",
+                        perform: "purchase"
+                    }, function(data, status) {
+                        alert("You have successfully purchased this photo");
+                        window.location.replace("../photos/view_photo.php?p=<?php echo $photo_purchase->getPhotoID() ?>");
+                    });
+
+                });
+            }
+
+        }, '#paypal-button');
+    </script>
+
 </div>
 <?php include('../inc/footer.php'); ?>
