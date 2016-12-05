@@ -38,7 +38,7 @@ if (isset($_POST['btnSubmit'])) {
             }
             //Create user in the database
 
-            if($user->create($conn,$_POST['txtPassword'])) {
+            if($user->create($conn,$_POST['txtPassword'], $group->getGroupID())) {
                 $group->setUserID($user->getUserID());
                 //Then set user group
                 if($group->create($conn)){
