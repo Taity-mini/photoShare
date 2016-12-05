@@ -83,7 +83,7 @@ if (is_null($_GET["u"])) {
                     }
                     $albumlink = "../photos/view_album.php?u=" . $row['albumID'];
                     echo "<td><b>Title:" . $row['albumName'] . "</b>";
-                    echo '<br><a href="' . $albumlink . '"> <img style="width:350px; height:350px;"  src="' . $photos->getFilePath() . '"/></a>';
+                    echo '<br><a href="' . $albumlink . '"> <img style="width:250px; height:250px;"  src="' . $photos->getFilePath() . '"/></a>';
                     echo "</td>";
                     if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
                         echo '</tr>';
@@ -102,28 +102,33 @@ if (is_null($_GET["u"])) {
             echo "<h2>Purchases [" . count($purchase_listing) . "]</h2>";
 
 
-            $cols = 5;    // Define number of columns
+            $cols = 4;    // Define number of columns
             $counter = 1;     // Counter used to identify if we need to start or end a row
 
             if (count($purchase_listing) > 0) {
-                echo '<table width="100%" align="center" cellpadding="4" cellspacing="1">';
+                echo '<div class="highslide-gallery">';
                 foreach ($purchase_listing as $row) {
                     $photo = new photos($row['photoID']);
                     $photo->getAllDetails($conn);
-                    if (($counter % $cols) == 1) {    // Check if it's new row
-                        echo '<tr>';
-                    }
-                    $photolink = "../photos/view_photo.php?p=" . $photo->getPhotoID();
+                    $photolink = "../photos/view_photo.php?p=" . $row['photoID'];
+
+                    echo '<a href="' . $photo->getFilePath() . '" class="highslide" onclick="return hs.expand(this)">
+                <img style="width:250px; height:250px;" src="' . $photo->getFilePath() . '" alt="Highslide JS"
+                     title="Click to enlarge" />
+            </a>';
+                    echo '<div class="highslide-caption">';
                     echo "<td><b>Title:" . $photo->getTitle() . "</b></br>";
-                    echo "<b>Price £:" . $photo->getPrice() . "</b>";
-                    echo '<br><a href="' . $photolink . '"> <img style="width:350px; height:350px;"  src="' . $photo->getFilePath() . '"/></a>';
-                    echo "</td>";
+                    echo "<b>Price £:" . $photo->getPrice() . "</b></br>";
+                    echo '<b><a href="' . $photolink . '">View the Photo</a></b>';
+                    echo '</div>';
+
                     if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
-                        echo '</tr>';
+                        echo '</br>';
                     }
                     $counter++;
                 }
-                echo "</table>";
+                echo "</div>";
+                echo "</div>";
             } else {
                 echo "This user hasn't purchased any photos yet.";
             }

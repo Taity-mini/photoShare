@@ -30,7 +30,7 @@ if (is_null($_GET["u"])) {
 
 
     if (isset($_POST['btnEdit'])) {
-            header('Location: edit_album.php?u='.$albums->getAlbumID());
+        header('Location: edit_album.php?u=' . $albums->getAlbumID());
     }
 
 }
@@ -87,21 +87,33 @@ if (is_null($_GET["u"])) {
         $cols = 5;    // Define number of columns
         $counter = 1;     // Counter used to identify if we need to start or end a row
 
-        echo '<table width="100%" align="center" cellpadding="4" cellspacing="1">';
-        foreach ($photo_listing as $row) {
-            if (($counter % $cols) == 1) {    // Check if it's new row
-                echo '<tr>';
+        if(count($photo_listing) > 0){
+            echo '<div class="highslide-gallery">';
+            foreach ($photo_listing as $row) {
+                $photolink = "../photos/view_photo.php?p=" . $row['photoID'];
+
+                echo '<a href="' . $row['filePath'] . '" class="highslide" onclick="return hs.expand(this)">
+                <img style="width:350px; height:350px;" src="' . $row['filePath'] . '" alt="Highslide JS"
+                     title="Click to enlarge" />
+            </a>';
+                echo '<div class="highslide-caption">';
+                echo 'Title: '.$row['title'] . '<br>';
+                echo 'Description: '.$row['description'] . '<br>';
+                echo '<b><a href="' . $photolink . '">View the Photo</a></b>';
+                echo '</div>';
+
+                if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
+                    echo '</br>';
+                }
+                $counter++;
             }
-            $photolink = "../photos/view_photo.php?p=" . $row['photoID'];
-            echo "<td><b>Title:" . $row['title'] . "</b>";
-            echo '<br><a href="' . $photolink . '"> <img style="width:350px; height:350px;"  src="' . $row['filePath'] . '"/></a>';
-            echo "</td>";
-            if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
-                echo '</tr>';
-            }
-            $counter++;
+            echo "</div>";
+        }else
+        {
+            echo "There are no photos in this album";
         }
-        echo "</table>";
+
+
 
         ?>
 

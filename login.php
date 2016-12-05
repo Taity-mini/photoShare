@@ -49,7 +49,7 @@ if (isset($_POST['btnSubmit'])) {
 <?php include('inc/header.php'); ?>
     <!--Content-->
     <div class="grid-container">
-        <p>Login</p>
+        <h1>Login</h1>
 
         <?php
         if (isset($_SESSION['error'])) {

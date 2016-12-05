@@ -30,6 +30,8 @@ if($pos != true) {
 
     <!--Custom CSS-->
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/g/pure@0.6.0(tables-min.css+buttons-min.css+forms-min.css)">
+
 
     <!--Jquery Library-->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -38,6 +40,39 @@ if($pos != true) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
 
     <![endif]-->
+
+
+
+    <script type="text/javascript" src="../highslide/highslide-with-gallery.js"></script>
+    <link rel="stylesheet" type="text/css" href="../highslide/highslide.css" />
+
+    <!--
+        2) Optionally override the settings defined at the top
+        of the highslide.js file. The parameter hs.graphicsDir is important!
+    -->
+
+    <script type="text/javascript">
+        hs.graphicsDir = '../highslide/graphics/';
+        hs.align = 'center';
+        hs.transitions = ['expand', 'crossfade'];
+        hs.outlineType = 'rounded-white';
+        hs.fadeInOut = true;
+        //hs.dimmingOpacity = 0.75;
+
+        // Add the controlbar
+        hs.addSlideshow({
+            //slideshowGroup: 'group1',
+            interval: 5000,
+            repeat: false,
+            useControls: true,
+            fixedControls: 'fit',
+            overlayOptions: {
+                opacity: .75,
+                position: 'bottom center',
+                hideOnMouseOut: true
+            }
+        });
+    </script>
 </head>
 <body>
 <header>

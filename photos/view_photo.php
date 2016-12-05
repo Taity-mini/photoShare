@@ -71,7 +71,7 @@ if (is_null($_GET["p"])) {
 ?>
 <?php include('../inc/header.php'); ?>
 
-    <div class="grid-container">
+    <br class="grid-container">
 
 
         <?php
@@ -88,43 +88,85 @@ if (is_null($_GET["p"])) {
 
 
         echo '<h1>View Photo -' . $photos->getTitle() . '</h1>';
-        echo "<img style='width:550px; height:550px;' src='" . $photos->getFilePath() . "' /></br>";
-        echo "</br>";
-        echo "Username:" . $users->getUsername();
-        echo "</br>";
-        echo "Album Name: " . $albums->getAlbumName();
-        echo "</br>";
-        echo "Description: " . $photos->getDescription();
-        echo "</br>";
-        echo "Price £: " . $photos->getPrice();
-        echo "</br>";
 
-        if (isset($_SESSION['userID'])) {
-            $userID = $_SESSION['userID'];
-            if ((($userID == $photos->getUserID()) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
+        echo '<div class="highslide-gallery">';
+        echo '<a  id="thumb1" href="' . $photos->getFilePath() . '" class="highslide" onclick="return hs.expand(this)">
+                <img class="displayed" style="width:550px; height:550px" src="' . $photos->getFilePath() . '" alt="Highslide JS"
+                     title="Click to enlarge" />
+            </a>';
 
-                ?>
+        echo '<div class="highslide-caption">';
+        //echo 'Title: '.$row['title'] . '<br>';
+        //echo 'Description: '.$row['description'] . '<br>';
+        //echo '<b><a href="' . $photolink . '">View the Photo</a></b>';
+        echo '</div>';
+        echo '</div>';
+
+        //echo "<img class='displayed' style='width:550px; height:550px;' src='" . $photos->getFilePath() . "' /></br>";
+        //        echo "</br>";
+        //        echo "Username:" . $users->getUsername();
+        //        echo "</br>";
+        //        echo "Album Name: " . $albums->getAlbumName();
+        //        echo "</br>";
+        //        echo "Description: " . $photos->getDescription();
+        //        echo "</br>";
+        //        echo "Price £: " . $photos->getPrice();
+        //        echo "</br>";
+
+        ?>
+
+    </br>
+        <table class="pure-table pure-table-bordered">
+            <tr>
+                <th>Username<br></th>
+                <th><?php echo $users->getUsername(); ?><br></th>
+            </tr>
+            <tr>
+                <td>Album Name<br></td>
+                <td><?php echo $albums->getAlbumName(); ?></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td><?php echo $albums->getAlbumDescription(); ?></td>
+            </tr>
+            <tr>
+                <td>Price:</td>
+                <td>£<?php echo $photos->getPrice(); ?></td>
+            </tr>
+            <tr>
+                <td>Options</td>
+                <td>
+                    <?php
+                    if (isset($_SESSION['userID'])) {
+                        $userID = $_SESSION['userID'];
+                        if ((($userID == $photos->getUserID()) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
+
+                            ?>
+                            <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
+                                <input type="submit" name="btnEdit" value="Edit Photo">
+                            </form>
+                            <?php
+                        }
+                        $photos->setUserID($userID);
+                        if ($photos->isPurchased($conn)) {
+                            echo "<b>You have purchased this photo</b>";
+                        } else if (((!$photos->isPurchased($conn)) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
+
+                            ?>
+
+                            <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
+                                <input type="submit" name="btnPurchase" value="Purchase Photo">
+                            </form>
+                            <?php
+                        }
+                    }
+                    ?>
+                </td>
+            </tr>
+        </table>
 
 
-                <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
-                    <input type="submit" name="btnEdit" value="Edit Photo">
-                </form>
-                <?php
-            }
-            $photos->setUserID($userID);
-            if ($photos->isPurchased($conn)) {
-                echo "<b>You have purchased this photo</b>";
-            } else if (((!$photos->isPurchased($conn)) && $group->isUserPhotographer($conn, $userID)) || ($group->isUserAdministrator($conn, $userID))) {
-
-                ?>
-
-                <form action="<?php echo htmlentities($_SERVER['REQUEST_URI']); ?>" method="post">
-                    <input type="submit" name="btnPurchase" value="Purchase Photo">
-                </form>
-
-                <?php
-            }
-        }
+        <?php
         echo "<h2>EXIF Data</h2>";
 
         $photos->getExifData();
@@ -139,12 +181,14 @@ if (is_null($_GET["p"])) {
         $comment_listing = $comments->listAllComments($conn);
 
         if ($comments->doesExist($conn)) {
-            echo '<table style="border 1px;">
+            echo '<table style="width: 100%;" class="pure-table pure-table-bordered">
+        <thead>
         <tr>
             <th>Username<br></th>
             <th>Comment</th>
             <th>Edit</th>
-        </tr>';
+        </tr>
+         </thead>';
 
             foreach ($comment_listing as $row) {
                 $userName = new users($row['userID']);
