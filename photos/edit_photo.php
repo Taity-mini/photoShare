@@ -23,11 +23,20 @@ if (is_null($_GET["p"])) {
 
     $photos = new photos($_GET["p"]);
     $photos->getAllDetails($conn);
+    $approve = false;
+
+
     if(isset($_SESSION['userID']))
     {
         $userID = $_SESSION['userID'];
         $group = new user_groups();
-        if ((($_SESSION['userID'] !==  $photos->getUserID())) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+        if (($_SESSION['userID'] ==  $photos->getUserID() && $group->isUserPhotographer($conn, $userID))) {
+            $approve = true;
+        }
+        if($group->isUserAdministrator($conn, $userID)){
+            $approve = true;
+        }
+        else if(!$approve){
             header('Location: ../message.php?id=badaccess');
         }
     } else{

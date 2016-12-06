@@ -22,7 +22,6 @@ if (is_null($_GET["u"])) {
     exit;
 } else {
 
-
     if (isset($_SESSION['userID'])) {
         $albums = new albums($_GET["u"]);
 
