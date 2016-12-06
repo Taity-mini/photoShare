@@ -6,7 +6,7 @@ $url = $_SERVER["REQUEST_URI"];
 $pos = strrpos($url, "message.php");
 
 //If not on message page then carry out checks
-if($pos != true) {
+if ($pos != true) {
 
     if (isset($_SESSION['userID'])) {
         $users = new Users(($_SESSION['userID']));
@@ -35,16 +35,15 @@ if($pos != true) {
 
     <!--Jquery Library-->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script  src = "../inc/functions.js"></script>
+    <script src="../inc/functions.js"></script>
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
 
     <![endif]-->
 
 
-
     <script type="text/javascript" src="../highslide/highslide-with-gallery.js"></script>
-    <link rel="stylesheet" type="text/css" href="../highslide/highslide.css" />
+    <link rel="stylesheet" type="text/css" href="../highslide/highslide.css"/>
 
     <!--
         2) Optionally override the settings defined at the top
@@ -83,10 +82,15 @@ if($pos != true) {
             <li><a href="../photos/">Photos</a>
                 <?php
                 if (isset($_SESSION['userID'])) {
-                    echo '<ul>
+                    $userID = $_SESSION['userID'];
+                    $group = new user_groups();
+                    if ($group->isUserPhotographer($conn, $userID)) {
+                        echo '<ul>
                     <li><a href="../photos/upload.php">Upload</a></li>
                     <li><a href="../photos/create_album.php">Create Album</a></li>
                 </ul>';
+                    }
+
                 }
                 ?>
             </li>

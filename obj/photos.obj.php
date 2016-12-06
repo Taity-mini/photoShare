@@ -243,13 +243,13 @@ class photos
             return false;
         }
         // Check file size
-        if ($_FILES["fileToUpload"]["size"] > 50000000) {
+        if ($_FILES["fileToUpload"]["size"] > 500000000) {
             echo "Sorry, your file is too large.";
             $uploadOk = 0;
             return false;
         }
         // Allow certain file formats
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+        if ($imageFileType != "jpg" && $imageFileType != "JPG"  && $imageFileType != "png" && $imageFileType != "jpeg"
             && $imageFileType != "gif"
         ) {
             echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
@@ -277,14 +277,17 @@ class photos
 
     public function getExifData()
     {
-        $exif = exif_read_data($this->getFilePath(), 'IFD0');
+        $exif = @exif_read_data($this->getFilePath(), 'IFD0');
         echo $exif === false ? "No header data found.<br />\n" : "Image contains headers<br />\n";
-        $exif = exif_read_data($this->getFilePath(), 0, true);
-        foreach ($exif as $key => $section) {
-            foreach ($section as $name => $val) {
-                echo "$key.$name: $val<br />\n";
+        $exif = @exif_read_data($this->getFilePath(), 0, true);
+        if($exif){
+            foreach ($exif as $key => $section) {
+                foreach ($section as $name => $val) {
+                    echo "$key.$name: $val<br />\n";
+                }
             }
         }
+
     }
 
 

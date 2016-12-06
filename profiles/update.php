@@ -12,7 +12,7 @@ include('../inc/config.php');
 require_once('../obj/users.obj.php');
 require_once('../obj/users.groups.obj.php');
 $conn = dbConnect();
-
+$access = false;
 
 if (is_null($_GET["u"])) {
     header('Location:' . $domain . '404.php');
@@ -27,9 +27,25 @@ if (is_null($_GET["u"])) {
     if (isset($_SESSION['userID'])) {
         $userID = $_SESSION['userID'];
         $group = new user_groups();
-        if ((($_SESSION['userID'] !== $_GET["u"])) && (!$group->isUserAdministrator($conn, $userID) || !$group->isUserPhotographer($conn, $userID))) {
+
+
+        if ($group->isUserPhotographer($conn, $userID)) {
+            if($_SESSION['userID'] == $_GET["u"]){
+                $access = true;
+            }
+        }
+
+        if ($group->isUserAdministrator($conn, $userID)) {
+            $access = true;
+        }
+        if($_SESSION['userID'] !==  $_GET['u']){
             header('Location: ../message.php?id=badaccess');
         }
+
+        else if(!$access){
+            header('Location: ../message.php?id=badaccess');
+        }
+
     } else {
         header('Location: ../message.php?id=badaccess');
     }

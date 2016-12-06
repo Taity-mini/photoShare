@@ -11,7 +11,7 @@ include('../inc/config.php');
 require_once('../obj/users.obj.php');
 require_once('../obj/users.groups.obj.php');
 $conn = dbConnect();
-
+$access = false;
 if (!isset($_SESSION['userID'])) {
     header('Location:' . $domain);
     exit;
@@ -29,9 +29,19 @@ if (is_null($_GET["u"])) {
     $groups->getAllDetails($conn);
 
 
-    if (($_SESSION['userID'] == $_GET["u"]) && (!$groups->isUserAdministrator($conn, $users->getUserID()))) {
-        header('Location:' . $domain);
-        exit;
+    if (isset($_SESSION['userID'])) {
+
+        $users = new Users(htmlentities($_GET['u']));
+
+
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ($group->isUserAdministrator($conn, $userID) && $_SESSION['userID'] !== $_GET["u"]) {
+            $access = true;
+        }
+        else if(!$access){
+            header('Location: ../message.php?id=badaccess');
+        }
     }
 
     if (!$users->doesExist($conn)) {

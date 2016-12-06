@@ -12,27 +12,30 @@ include('../inc/config.php');
 require_once('../obj/users.obj.php');
 require_once('../obj/users.groups.obj.php');
 $conn = dbConnect();
-
+$access = false;
 if (!isset($_SESSION['userID'])) {
     header('Location:' . $domain);
     exit;
 }
 
-
 if (is_null($_GET["u"])) {
     header('Location:' . $domain . '404.php');
     exit;
 } else {
-    $users = new Users(htmlentities($_GET['u']));
-    $groups = new user_groups();
 
-    $groups->setUserID($_GET["u"]);
-    $groups->getAllDetails($conn);
+    if (isset($_SESSION['userID'])) {
+
+        $users = new Users(htmlentities($_GET['u']));
 
 
-    if(($_SESSION['userID'] == $_GET["u"]) && (!$groups->isUserAdministrator($conn,$users->getUserID()))){
-        header('Location:' . $domain);
-        exit;
+        $userID = $_SESSION['userID'];
+        $group = new user_groups();
+        if ($group->isUserAdministrator($conn, $userID) && $_SESSION['userID'] !== $_GET["u"]) {
+            $access = true;
+        }
+        else if(!$access){
+            header('Location: ../message.php?id=badaccess');
+        }
     }
 
     if (!$users->doesExist($conn)) {

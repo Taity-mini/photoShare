@@ -31,6 +31,9 @@ if (isset($_SESSION['userID'])) {
 
             print "<h1 style='text-align: center'>Welcome to photoShare," . $user->getUsername() . "</h1>";
         }
+        else{
+            print "<h1 style='text-align: center'>Welcome to photoShare, Guest</h1>";
+        }
 
         echo "<h2>Statistics</h2>";
         echo "On this site there are currently:
@@ -79,7 +82,7 @@ if (isset($_SESSION['userID'])) {
                 $userlink = "../profiles/view.php?u=" . $user->getUserID();
                 echo "<td><b>Title: " . $row['albumName'] . "</b><br>";
                 echo '<b>Username:<a href="' . $userlink . '">' . $user->getUsername() . '</a></b>';
-                echo '<br><a href="' . $albumlink . '"> <img style="width:350px; height:350px;"  src="' . $photos->getFilePath() . '"/></a>';
+                echo '<br><a href="' . $albumlink . '"> <img style="width:250px; height:250px;"  src="' . $photos->getFilePath() . '"/></a>';
                 echo "</td>";
                 if (($counter % $cols) == 0) { // If it's last column in each row then counter remainder will be zero
                     echo '</tr>';

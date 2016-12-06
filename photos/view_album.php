@@ -113,8 +113,6 @@ if (is_null($_GET["u"])) {
             echo "There are no photos in this album";
         }
 
-
-
         ?>
 
     </div>

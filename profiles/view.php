@@ -47,9 +47,10 @@ if (is_null($_GET["u"])) {
 
         echo "Email:  " . $users->getEmail();
         echo "</br>";
-
-        echo "Website:  " . $users->getWebsite();
-        echo "</br>";
+        if($users->getWebsite() == ""){
+            echo "Website:  <a href=". $users->getWebsite().">View here</a>";
+            echo "</br>";
+        }
 
         echo "Bio:  " . $users->getBio();
         echo "</br>";

@@ -90,12 +90,17 @@ if (isset($_POST['btnSubmit'])) {
             $albums = new albums();
             $options = $albums->listAllAlbumSelect($conn, $user->getUserID());
             //var_dump($options);
-            echo '<select id="sltAlbum" name="sltAlbum">';
-            foreach ($options as $key => $value) {
+            if(count($options)>0){
+                echo '<select id="sltAlbum" name="sltAlbum">';
+                foreach ($options as $key => $value) {
 
-                echo '<option value="' . $key . '">' . $value . '</option>';
+                    echo '<option value="' . $key . '">' . $value . '</option>';
 
+                }
+            }else{
+                header('Location: create_album.php');
             }
+
             echo '</select>';
             ?>
         </label>

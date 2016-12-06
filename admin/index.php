@@ -19,6 +19,20 @@ if (!isset($_SESSION['userID'])) {
     header('Location:' . $domain);
     exit;
 }
+$access = false;
+
+
+
+if (isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+    $group = new user_groups();
+    if ($group->isUserAdministrator($conn, $userID)) {
+        $access = true;
+    }
+    else if(!$access){
+        header('Location: ../message.php?id=badaccess');
+    }
+}
 
 ?>
 
