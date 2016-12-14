@@ -441,4 +441,29 @@ class photos
         }
     }
 
+    //API Functions
+
+    public function listAllPhotosAPI($conn, $photoID = null)
+    {
+        $sql = "SELECT * FROM photos p";
+        if (!is_null($photoID)) {
+            $sql .= " WHERE p.photoID = :photoID";
+        }
+
+        $stmt = $conn->prepare($sql);
+
+        if (!is_null($photoID)) {
+            $stmt->bindParam(':photoID',$photoID, PDO::PARAM_STR);
+        }
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $json = json_encode($results);
+            echo  $json;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
 }

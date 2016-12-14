@@ -281,6 +281,28 @@ class albums
         }
     }
 
+    //API Functions
+    public function listAllAlbumsAPI($conn, $albumID = null)
+    {
+        $sql = "SELECT * FROM albums a";
+        if (!is_null($albumID)) {
+            $sql .= " WHERE a.albumID = :albumID";
+        }
+        $stmt = $conn->prepare($sql);
+
+        if (!is_null($albumID)) {
+            $stmt->bindParam(':albumID',$albumID, PDO::PARAM_STR);
+        }
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $json = json_encode($results);
+            echo  $json;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
 
 }
 

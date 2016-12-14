@@ -513,4 +513,29 @@ class users
         }
     }
 
+    //API functions
+    public function listAllUsersAPI($conn, $userID = null)
+    {
+        $sql = "SELECT * FROM profiles p";
+        if (!is_null($userID)) {
+            $sql .= " WHERE p.userID = :userID";
+        }
+
+        $stmt = $conn->prepare($sql);
+
+        if (!is_null($userID)) {
+            $stmt->bindParam(':userID',$userID, PDO::PARAM_STR);
+        }
+
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+            $json = json_encode($results);
+            echo  $json;
+        } catch (PDOException $e) {
+            return "Database query failed: " . $e->getMessage();
+        }
+    }
+
+
 }
