@@ -458,9 +458,18 @@ class photos
 
         try {
             $stmt->execute();
-            $results = $stmt->fetchAll();
-            $json = json_encode($results);
-            echo  $json;
+
+            $photoData = array();
+
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                if (!is_null($photoID)) {
+                    $photoData['Photo'][] = $row;
+                } else{
+                    $photoData['AllPhotos'][] = $row;
+                }
+            }
+            $json = (json_encode($photoData));
+            echo $json;
         } catch (PDOException $e) {
             return "Database query failed: " . $e->getMessage();
         }

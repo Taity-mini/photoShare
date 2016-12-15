@@ -490,11 +490,12 @@ class users
         }
     }
 
-   //Searching Functions
-    public function search($conn, $field, $query){
+    //Searching Functions
+    public function search($conn, $field, $query)
+    {
         try {
 
-            $field = "`".str_replace("`","``",$field)."`";
+            $field = "`" . str_replace("`", "``", $field) . "`";
             $sql = "SELECT * FROM `profiles` WHERE $field LIKE :query";
             $stmt = $conn->prepare($sql);
 
@@ -502,9 +503,9 @@ class users
             $stmt->bindParam(':query', $query, PDO::PARAM_STR);
             $stmt->execute();
             $results = $stmt->fetchAll();
-            if (isset($results)){
+            if (isset($results)) {
                 return $results;
-            }else{
+            } else {
                 return false;
             }
 
@@ -524,14 +525,24 @@ class users
         $stmt = $conn->prepare($sql);
 
         if (!is_null($userID)) {
-            $stmt->bindParam(':userID',$userID, PDO::PARAM_STR);
+            $stmt->bindParam(':userID', $userID, PDO::PARAM_STR);
         }
 
         try {
             $stmt->execute();
-            $results = $stmt->fetchAll();
-            $json = json_encode($results);
-            echo  $json;
+            //$results = array_values($stmt->fetchAll(PDO::FETCH_OBJ));
+
+            $userData = array();
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if (!is_null($userID)) {
+                    $userData['User'][] = $row;
+                } else {
+                    $userData['AllUsers'][] = $row;
+                }
+            }
+            $json = (json_encode($userData));
+            echo $json;
         } catch (PDOException $e) {
             return "Database query failed: " . $e->getMessage();
         }

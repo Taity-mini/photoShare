@@ -2,7 +2,7 @@
 //Photoshare
 //Albums JSON API
 session_start();
-
+header('Content-Type: application/json');
 include('../inc/config.php');
 require_once('../obj/albums.obj.php');
 

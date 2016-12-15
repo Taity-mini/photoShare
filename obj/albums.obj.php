@@ -295,9 +295,17 @@ class albums
         }
         try {
             $stmt->execute();
-            $results = $stmt->fetchAll();
-            $json = json_encode($results);
-            echo  $json;
+            $albumData = array();
+
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                if (!is_null($albumID)) {
+                    $albumData['Album'][] = $row;
+                } else{
+                    $albumData['AllAlbums'][] = $row;
+                }
+            }
+            $json = (json_encode($albumData));
+            echo $json;
         } catch (PDOException $e) {
             return "Database query failed: " . $e->getMessage();
         }

@@ -3,7 +3,7 @@
 //Photoshare
 //Photos JSON API
 session_start();
-
+header('Content-Type: application/json');
 include('../inc/config.php');
 require_once('../obj/photos.obj.php');
 
